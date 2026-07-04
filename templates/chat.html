@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical AI Assistant</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>🩺 Medical AI Assistant</h1>
+        <p>Ask medical questions based on trusted medical documents.</p>
+    </div>
+
+    <div id="chat-box" class="chat-box"></div>
+
+    <div class="input-area">
+        <input
+            type="text"
+            id="question"
+            placeholder="Ask your medical question..."
+            autocomplete="off">
+
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+</div>
+
+<script>
+
+const chatBox = document.getElementById("chat-box");
+
+async function sendMessage(){
+
+    const input = document.getElementById("question");
+
+    const question = input.value.trim();
+
+    if(question==="") return;
+
+    chatBox.innerHTML += `
+    <div class="message user">
+        ${question}
+    </div>
+    `;
+
+    input.value="";
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    const response = await fetch("/get",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            msg:question
+        })
+    });
+
+    const data = await response.text();
+
+    chatBox.innerHTML += `
+    <div class="message bot">
+        ${data}
+    </div>
+    `;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+}
+
+document.getElementById("question").addEventListener("keypress",function(e){
+
+    if(e.key==="Enter"){
+
+        sendMessage();
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
